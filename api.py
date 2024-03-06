@@ -379,12 +379,12 @@ dict_language = {
 
 slice_option = {
     "凑四句一切": "凑四句一切",
-    "凑50字一切": "凑50字一切",
+    "凑30字一切": "凑30字一切",
     "按中文句号。切": "按中文句号。切",
     "按英文句号.切": "按英文句号.切",
     "按标点符号切": "按标点符号切",
     "per 4 sentences": "凑四句一切",
-    "per 50 letters": "凑50字一切",
+    "per 30 letters": "凑30字一切",
     "per period": "按英文句号.切",
     "per punctuation mark": "按标点符号切",
     None: "No slice"
@@ -522,7 +522,7 @@ def get_tts_wav(ref_wav_path, prompt_text, prompt_language, text, text_language,
     print(f"[INFO] 文本切句選項: {how_to_cut}")
     if (how_to_cut == "凑四句一切"):
             text = cut1(text)
-    elif (how_to_cut == "凑50字一切"):
+    elif (how_to_cut == "凑30字一切"):
         text = cut2(text)
     elif (how_to_cut == "按英文句号.切"):
         text = cut3(text)
@@ -643,14 +643,14 @@ def cut2(inp):
     for i in range(len(inps)):
         summ += len(inps[i])
         tmp_str += inps[i]
-        if summ > 50:
+        if summ > 30:
             summ = 0
             opts.append(tmp_str)
             tmp_str = ""
     if tmp_str != "":
         opts.append(tmp_str)
     # print(opts)
-    if len(opts) > 1 and len(opts[-1]) < 50:  ##如果最后一个太短了，和前一个合一起
+    if len(opts) > 1 and len(opts[-1]) < 30:  ##如果最后一个太短了，和前一个合一起
         opts[-2] = opts[-2] + opts[-1]
         opts = opts[:-1]
     return "\n".join(opts)
