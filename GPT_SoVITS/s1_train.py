@@ -93,12 +93,25 @@ class my_model_ckpt(ModelCheckpoint):
 
 def main(args):
     config = load_yaml_config(args.config_file)
-
+    if args.e_name != "":
+        config["train"]["exp_name"] = args.e_name
+        config["output_dir"] = f"logs/{args.e_name}/logs_s1"
+        config["train_phoneme_path"] = f"logs/{args.e_name}/2-name2text.txt"
+        config["train_semantic_path"] = f"logs/{args.e_name}/6-name2semantic.tsv"
+        print(f"Manually set name to {args.e_name}")
     output_dir = Path(config["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
 
     ckpt_dir = output_dir / "ckpt"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    current_dir = os.getcwd()
+    paths_to_check = [output_dir, current_dir + "/GPT_weights"]
+    # check log directory
+    for pth in paths_to_check:
+        print(f'Checking {pth}')
+        if not os.path.exists(pth):
+            os.makedirs(pth)
 
     seed_everything(config["train"]["seed"], workers=True)
     ckpt_callback: ModelCheckpoint = my_model_ckpt(
@@ -165,6 +178,12 @@ if __name__ == "__main__":
         type=str,
         default="configs/s1longer.yaml",
         help="path of config file",
+    )
+    parser.add_argument(
+        "--e_name",
+        type=str,
+        default="",
+        help="trained model and directory name",
     )
     # args for dataset
     # parser.add_argument('--train_semantic_path',type=str,default='/data/docker/liujing04/gpt-vits/fine_tune_dataset/xuangou/6-name2semantic.tsv')

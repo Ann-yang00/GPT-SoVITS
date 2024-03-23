@@ -1,5 +1,6 @@
-import utils, os
-
+import utils, os, sys
+now_dir = os.getcwd()
+sys.path.append(now_dir)
 hps = utils.get_hparams(stage=2)
 os.environ["CUDA_VISIBLE_DEVICES"] = hps.train.gpu_numbers.replace("-", ",")
 import torch
@@ -53,12 +54,17 @@ def main():
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = str(randint(20000, 55555))
 
+    if hps.e_name != "":
+        hps.data.exp_dir = now_dir + f"/logs/{hps.e_name}"
+        hps.data.s2_ckpt_dir = f"logs/{hps.e_name}"
+        hps.name = hps.e_name
+
     mp.spawn(
         run,
         nprocs=n_gpus,
         args=(
             n_gpus,
-            hps,
+            hps, 
         ),
     )
 
@@ -81,6 +87,13 @@ def run(rank, n_gpus, hps):
     torch.manual_seed(hps.train.seed)
     if torch.cuda.is_available():
         torch.cuda.set_device(rank)
+
+    paths_to_check = [hps.data.exp_dir + "/logs_s2", now_dir + "/SoVITS_weights"]
+    # check log directory
+    for pth in paths_to_check:
+        print(f'Checking {pth}')
+        if not os.path.exists(pth):
+            os.makedirs(pth)
 
     train_dataset = TextAudioSpeakerLoader(hps.data)  ########
     train_sampler = DistributedBucketSampler(

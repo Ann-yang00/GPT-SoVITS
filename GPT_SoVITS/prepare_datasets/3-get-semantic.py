@@ -1,20 +1,20 @@
 import os
-
-inp_text = os.environ.get("inp_text")
-exp_name = os.environ.get("exp_name")
-i_part = os.environ.get("i_part")
-all_parts = os.environ.get("all_parts")
-os.environ["CUDA_VISIBLE_DEVICES"] = os.environ.get("_CUDA_VISIBLE_DEVICES")
-opt_dir = os.environ.get("opt_dir")
-pretrained_s2G = os.environ.get("pretrained_s2G")
-s2config_path = os.environ.get("s2config_path")
+current_dir = os.getcwd()
+import sys, pdb
+sys.path.append(current_dir + "/GPT_SoVITS/")
+import configs.cfig as cfig
+inp_text = current_dir + cfig.inp_text
+exp_name = cfig.exp_name
+i_part = cfig.i_part
+all_parts = cfig.all_parts
+os.environ["CUDA_VISIBLE_DEVICES"] = cfig.gpu_id
+opt_dir = current_dir + cfig.opt_dir
+pretrained_s2G = current_dir + cfig.pretrained_s2G
+s2config_path = current_dir + cfig.s2config_path
 is_half = eval(os.environ.get("is_half", "True"))
+
 import math, traceback
 import multiprocessing
-import sys, pdb
-
-now_dir = os.getcwd()
-sys.path.append(now_dir)
 from random import shuffle
 import torch.multiprocessing as mp
 from glob import glob
@@ -34,7 +34,7 @@ logging.getLogger("numba").setLevel(logging.WARNING)
 
 
 hubert_dir = "%s/4-cnhubert" % (opt_dir)
-semantic_path = "%s/6-name2semantic-%s.tsv" % (opt_dir, i_part)
+semantic_path = "%s/6-name2semantic.tsv" % (opt_dir)
 if os.path.exists(semantic_path) == False:
     os.makedirs(opt_dir, exist_ok=True)
 

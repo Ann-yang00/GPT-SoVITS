@@ -15,6 +15,7 @@ import logging
 
 logging.getLogger("numba").setLevel(logging.ERROR)
 logging.getLogger("matplotlib").setLevel(logging.ERROR)
+now_dir = os.getcwd()
 
 MATPLOTLIB_FLAG = False
 
@@ -196,11 +197,14 @@ def get_hparams(init=True, stage=1):
         "-c",
         "--config",
         type=str,
-        default="./configs/s2.json",
+        default= now_dir + "/GPT_SoVITS/configs/tmp_s2.json",
         help="JSON file for configuration",
     )
     parser.add_argument(
         "-p", "--pretrain", type=str, required=False, default=None, help="pretrain dir"
+    )
+    parser.add_argument(
+        "-en", "--e_name", type=str, required=False, default="", help="trained model and directory name"
     )
     parser.add_argument(
         "-rs",
@@ -224,6 +228,7 @@ def get_hparams(init=True, stage=1):
     hparams = HParams(**config)
     hparams.pretrain = args.pretrain
     hparams.resume_step = args.resume_step
+    hparams.e_name = args.e_name
     # hparams.data.exp_dir = args.exp_dir
     if stage == 1:
         model_dir = hparams.s1_ckpt_dir

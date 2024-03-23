@@ -1,24 +1,28 @@
 # -*- coding: utf-8 -*-
 
 import os
-
-inp_text = os.environ.get("inp_text")
-inp_wav_dir = os.environ.get("inp_wav_dir")
-exp_name = os.environ.get("exp_name")
-i_part = os.environ.get("i_part")
-all_parts = os.environ.get("all_parts")
-os.environ["CUDA_VISIBLE_DEVICES"] = os.environ.get("_CUDA_VISIBLE_DEVICES")
-opt_dir = os.environ.get("opt_dir")
-bert_pretrained_dir = os.environ.get("bert_pretrained_dir")
-is_half = eval(os.environ.get("is_half", "True"))
 import sys, numpy as np, traceback, pdb
 import os.path
 from glob import glob
 from tqdm import tqdm
-from text.cleaner import clean_text
 import torch
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 import numpy as np
+
+current_dir = os.getcwd()
+sys.path.append(current_dir + "/GPT_SoVITS/")
+from text.cleaner import clean_text
+import configs.cfig as cfig
+
+inp_text = current_dir + cfig.inp_text
+inp_wav_dir = current_dir + cfig.inp_wav_dir
+exp_name = cfig.exp_name
+i_part = cfig.i_part
+all_parts = cfig.all_parts
+opt_dir = current_dir + cfig.opt_dir
+bert_pretrained_dir = current_dir + cfig.bert_pretrained_dir
+is_half = eval(os.environ.get("is_half", "True"))
+os.environ["CUDA_VISIBLE_DEVICES"] = cfig.gpu_id
 
 # inp_text=sys.argv[1]
 # inp_wav_dir=sys.argv[2]
@@ -42,7 +46,7 @@ def my_save(fea,path):#####fix issue: torch.save doesn't support chinese path
     shutil.move(tmp_path,"%s/%s"%(dir,name))
 
 
-txt_path = "%s/2-name2text-%s.txt" % (opt_dir, i_part)
+txt_path = "%s/2-name2text.txt" % (opt_dir)
 if os.path.exists(txt_path) == False:
     bert_dir = "%s/3-bert" % (opt_dir)
     os.makedirs(opt_dir, exist_ok=True)
